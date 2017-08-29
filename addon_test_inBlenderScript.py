@@ -10,14 +10,6 @@ bl_info = {
     "warning": "",
     "category": "Render"}
 
-def get_cameras():
-    """Retrieve all cameras' names for the current scene"""
-    l = []
-    for obj in bpy.data.objects:
-        if obj.type == 'CAMERA':
-            l.append(obj)
-    return l
-
 class CamProp(bpy.types.PropertyGroup):
     
     @classmethod
@@ -46,10 +38,10 @@ class BatchRender(bpy.types.Operator):
 
     # Define some variables to register
     _timer = None
-    cam = get_cameras()
     shots = []
     stop = None
     rendering = None
+    fr = True                              # needed for break infinite render loop
     path = "//"
 
     # Define the handler functions. I use pre and
@@ -58,8 +50,8 @@ class BatchRender(bpy.types.Operator):
         self.rendering = True
 
     def post(self, dummy):
-        self.shots.pop(0) # This is just to render the next
-                          # image in another path
+        self.shots.pop(0)   # This is just to render the next
+                            # image in another path
         self.rendering = False
 
     def cancelled(self, dummy):
@@ -71,9 +63,11 @@ class BatchRender(bpy.types.Operator):
         self.stop = False
         self.rendering = False
         
-        for item in self.cam:
-            if item.custom.isSelected:
-                self.shots.append(item)       
+        while self.fr:
+            for item in bpy.data.objects:
+                if item.type == 'CAMERA' and item.custom.isSelected:
+                    self.shots.append(item)
+            self.fr = False                 # make the loop work only once per instance   
 
         bpy.context.scene.render.filepath = self.path
 
@@ -136,7 +130,10 @@ class BatchRenderPanel(bpy.types.Panel):
         split = layout.split()
         col = split.column()
         
-        elements = get_cameras()
+        elements = []
+        for item in bpy.data.objects:
+                if item.type == 'CAMERA':
+                    elements.append(item)
         
         i = 0
         for item in elements:
