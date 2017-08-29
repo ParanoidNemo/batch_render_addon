@@ -3,7 +3,7 @@ import bpy
 bl_info = {
     "name": "Batch Render",
     "author": "Andrea Calzavacca",
-    "version": (0, 1, 0),
+    "version": (0, 1, 1),
     "blender": (2, 7, 8),
     "location": "Render > Batch Render",
     "description": "Make possible to render more than one camera without manually start every render",
@@ -74,7 +74,7 @@ class BatchRender(bpy.types.Operator):
         for item in self.cam:
             if item.custom.isSelected:
                 self.shots.append(item)       
-		
+
         bpy.context.scene.render.filepath = self.path
 
         bpy.app.handlers.render_pre.append(self.pre)
@@ -105,13 +105,9 @@ class BatchRender(bpy.types.Operator):
 
             elif self.rendering is False: # Nothing is currently rendering.
                                           # Proceed to render.
-                #sc = bpy.context.scene
+
                 sceneKey = bpy.data.scenes.keys()[0]
 
-                #for item in self.shots:
-                    #if item.custom.isSelected:
-                    #sc.camera = item
-                    #sc.render.filepath = self.path + item.name
                 bpy.data.scenes[sceneKey].camera = self.shots[0]
                 bpy.data.scenes[sceneKey].render.filepath = self.path + self.shots[0].name
                 bpy.ops.render.render("INVOKE_DEFAULT", write_still=True)
@@ -157,14 +153,10 @@ class BatchRenderPanel(bpy.types.Panel):
         row.operator("render.batch", text="Batch Render", icon='RENDER_STILL')
 
 def register():
-    bpy.utils.register_class(CamProp)
-    bpy.utils.register_class(BatchRender)
-    bpy.utils.register_class(BatchRenderPanel)
+    bpy.utils.register_module(__name__)
 
 def unregister():
-    bpy.utils.unregister_class(CamProp)
-    bpy.utils.unregister_class(BatchRender)
-    bpy.utils.unregister_class(BatchRenderPanel)
+    bpy.utils.unregister_module(__name__)
 
 # START DEBUG SECTION ---------------------------------------------------------------------------------------
 # launch addon as script into blender text editor -----------------------------------------------------------
