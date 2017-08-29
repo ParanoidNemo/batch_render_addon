@@ -3,20 +3,12 @@ import bpy
 bl_info = {
     "name": "Batch Render",
     "author": "Andrea Calzavacca",
-    "version": (0, 1, 0),
+    "version": (0, 1, 1),
     "blender": (2, 7, 8),
     "location": "Render > Batch Render",
     "description": "Make possible to render more than one camera without manually start every render",
     "warning": "",
     "category": "Render"}
-
-def get_cameras():
-    """Retrieve all cameras' names for the current scene"""
-    l = []
-    for obj in bpy.data.objects:
-        if obj.type == 'CAMERA':
-            l.append(obj)
-    return l
 
 class CamProp(bpy.types.PropertyGroup):
     
@@ -46,10 +38,10 @@ class BatchRender(bpy.types.Operator):
 
     # Define some variables to register
     _timer = None
-    cam = get_cameras()
     shots = []
     stop = None
     rendering = None
+    fr = True                              # needed for break infinite render loop
     path = "//"
 
     # Define the handler functions. I use pre and
@@ -58,8 +50,8 @@ class BatchRender(bpy.types.Operator):
         self.rendering = True
 
     def post(self, dummy):
-        self.shots.pop(0) # This is just to render the next
-                          # image in another path
+        self.shots.pop(0)   # This is just to render the next
+                            # image in another path
         self.rendering = False
 
     def cancelled(self, dummy):
@@ -71,10 +63,12 @@ class BatchRender(bpy.types.Operator):
         self.stop = False
         self.rendering = False
         
-        for item in self.cam:
-            if item.custom.isSelected:
-                self.shots.append(item)       
-		
+        while self.fr:
+            for item in bpy.data.objects:
+                if item.type == 'CAMERA' and item.custom.isSelected:
+                    self.shots.append(item)
+            self.fr = False                 # make the loop work only once per instance   
+
         bpy.context.scene.render.filepath = self.path
 
         bpy.app.handlers.render_pre.append(self.pre)
@@ -105,13 +99,9 @@ class BatchRender(bpy.types.Operator):
 
             elif self.rendering is False: # Nothing is currently rendering.
                                           # Proceed to render.
-                #sc = bpy.context.scene
+
                 sceneKey = bpy.data.scenes.keys()[0]
 
-                #for item in self.shots:
-                    #if item.custom.isSelected:
-                    #sc.camera = item
-                    #sc.render.filepath = self.path + item.name
                 bpy.data.scenes[sceneKey].camera = self.shots[0]
                 bpy.data.scenes[sceneKey].render.filepath = self.path + self.shots[0].name
                 bpy.ops.render.render("INVOKE_DEFAULT", write_still=True)
@@ -140,7 +130,10 @@ class BatchRenderPanel(bpy.types.Panel):
         split = layout.split()
         col = split.column()
         
-        elements = get_cameras()
+        elements = []
+        for item in bpy.data.objects:
+                if item.type == 'CAMERA':
+                    elements.append(item)
         
         i = 0
         for item in elements:
@@ -157,14 +150,10 @@ class BatchRenderPanel(bpy.types.Panel):
         row.operator("render.batch", text="Batch Render", icon='RENDER_STILL')
 
 def register():
-    bpy.utils.register_class(CamProp)
-    bpy.utils.register_class(BatchRender)
-    bpy.utils.register_class(BatchRenderPanel)
+    bpy.utils.register_module(__name__)
 
 def unregister():
-    bpy.utils.unregister_class(CamProp)
-    bpy.utils.unregister_class(BatchRender)
-    bpy.utils.unregister_class(BatchRenderPanel)
+    bpy.utils.unregister_module(__name__)
 
 # START DEBUG SECTION ---------------------------------------------------------------------------------------
 # launch addon as script into blender text editor -----------------------------------------------------------
