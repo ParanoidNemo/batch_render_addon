@@ -7,7 +7,7 @@ bl_info = {
     "blender": (2, 7, 8),
     "location": "Render > Batch Render",
     "description": "Make possible to render more than one camera without manually start every render",
-    "warning": "",
+    "warning": "Beta version: 1.1",
     "category": "Render"}
 
 class CamProp(bpy.types.PropertyGroup):
