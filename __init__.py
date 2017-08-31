@@ -11,23 +11,17 @@ from . import function as f
 bl_info = {
     "name": "Batch Render",
     "author": "Andrea Calzavacca",
-    "version": (0, 0, 1),
+    "version": (0, 2, 0),
     "blender": (2, 7, 8),
-    # "api": 53207,
     "location": "Render > Batch Render",
     "description": "Make possible to render more than one camera without manually start every render",
-    "warning": "",
+    "warning": "Beta version: 2.0",
     "category": "Render"}
 
 
 def register():
-    bpy.utils.register_class(p.CamProp)
-    bpy.utils.register_class(g.BatchRenderPanel)
-    bpy.utils.register_class(f.BatchRender)
+    bpy.utils.register_module(__name__)
 
 
 def unregister():
-    bpy.utils.unregister_class(p.CamProp)
-    bpy.utils.unregister_class(g.BatchRenderPanel)
-    bpy.utils.unregister_class(f.BatchRender)
-
+    bpy.utils.unregister_module(__name__)
