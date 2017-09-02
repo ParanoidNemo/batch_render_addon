@@ -6,6 +6,7 @@ import bpy
 
 from . import properties
 from . import operator
+from . import gui
 
 bl_info = {
     "name": "Batch Render",
