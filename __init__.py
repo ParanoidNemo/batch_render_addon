@@ -4,9 +4,8 @@
 
 import bpy
 
-from . import properties as p
-from . import gui as g
-from . import function as f
+from . import properties
+from . import operator
 
 bl_info = {
     "name": "Batch Render",
