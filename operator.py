@@ -9,7 +9,7 @@ import sys
 import bpy
 
 
-class BatchRender(bpy.type.Operator):
+class BatchRender(bpy.types.Operator):
     """Batch Render"""
     bl_idname = "render.batch"
     bl_label = "Subsequently render all selected cameras"
