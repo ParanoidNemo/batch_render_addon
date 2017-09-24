@@ -29,8 +29,7 @@ class BatchRender(bpy.types.Operator):
         self.rendering = True
 
     def post(self, dummy):
-        self.shots.pop(0)   # This is just to render the next
-                            # image in another path
+        self.shots.pop(0)
         self.rendering = False
 
     def cancelled(self, dummy):
@@ -86,8 +85,3 @@ class BatchRender(bpy.types.Operator):
                 bpy.ops.render.render("INVOKE_DEFAULT", write_still=True)
 
         return {"PASS_THROUGH"}
-        # This is very important! If we used "RUNNING_MODAL", this new modal function
-        # would prevent the use of the X button to cancel rendering, because this
-        # button is managed by the modal function of the render operator,
-        # not this new operator!
-
