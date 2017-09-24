@@ -21,7 +21,7 @@ class BatchRender(bpy.types.Operator):
     stop = None
     rendering = None
     fr = True                              # needed for break infinite render loop
-    path = "//"
+    path = None
 
     # Define the handler functions. I use pre and
     # post to know if Blender "is rendering"
@@ -48,7 +48,7 @@ class BatchRender(bpy.types.Operator):
                     self.shots.append(item)
             self.fr = False                 # make the loop work only once per instance   
 
-        bpy.context.scene.render.filepath = self.path
+        self.path = bpy.context.scene.render.filepath
 
         bpy.app.handlers.render_pre.append(self.pre)
         bpy.app.handlers.render_post.append(self.post)
