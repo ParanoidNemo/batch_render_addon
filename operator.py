@@ -31,6 +31,10 @@ class BatchRender(bpy.types.Operator):
     def post(self, dummy):
         self.shots.pop(0)
         self.rendering = False
+        if bpy.data.images['Render Result'].render_slots.active_index == 8:
+            bpy.data.images['Render Result'].render_slots.active_index = 1
+        else:
+            bpy.data.images['Render Result'].render_slots.active_index += 1
 
     def cancelled(self, dummy):
         self.stop = True
