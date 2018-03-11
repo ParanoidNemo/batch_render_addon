@@ -11,11 +11,11 @@ from . import gui
 bl_info = {
     "name": "Batch Render",
     "author": "Andrea Calzavacca",
-    "version": (0, 2, 0),
-    "blender": (2, 7, 8),
+    "version": (0, 2, 3),
+    "blender": (2, 7, 9),
     "location": "Render > Batch Render",
     "description": "Make possible to render more than one camera without manually start every render",
-    "warning": "Beta version: 2.2",
+    "warning": "Beta version: 2.3",
     "category": "Render"}
 
 
