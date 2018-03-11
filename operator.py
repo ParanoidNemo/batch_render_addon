@@ -4,6 +4,7 @@
 
 # import standard modules
 import sys
+import re
 
 # import blender module
 import bpy
@@ -20,8 +21,9 @@ class BatchRender(bpy.types.Operator):
     shots = []
     stop = None
     rendering = None
-    fr = True                              # needed for break infinite render loop
+    fr = True                               # needed for break infinite render loop
     path = None
+    c_shots = []                           ## used to store valid names for cameras
 
     # Define the handler functions. I use pre and
     # post to know if Blender "is rendering"
@@ -29,7 +31,9 @@ class BatchRender(bpy.types.Operator):
         self.rendering = True
 
     def post(self, dummy):
+        bpy.context.scene.render.filepath = self.path.replace(self.c_shots[0],"") # return path to original state
         self.shots.pop(0)
+        self.c_shots.pop(0)
         self.rendering = False
         if bpy.data.images['Render Result'].render_slots.active_index == 8:
             bpy.data.images['Render Result'].render_slots.active_index = 1
@@ -49,6 +53,10 @@ class BatchRender(bpy.types.Operator):
             for item in bpy.data.objects:
                 if item.type == 'CAMERA' and item.custom.isSelected:
                     self.shots.append(item)
+            ## check if final path contains illegal char
+            for item in self.shots:
+                item = re.sub(r'([<>:"|?*/])', "", item.name)
+                self.c_shots.append(item)
             self.fr = False                 # make the loop work only once per instance   
 
         self.path = bpy.context.scene.render.filepath
@@ -85,7 +93,7 @@ class BatchRender(bpy.types.Operator):
                 sceneKey = bpy.data.scenes.keys()[0]
 
                 bpy.data.scenes[sceneKey].camera = self.shots[0]
-                bpy.data.scenes[sceneKey].render.filepath = self.path + self.shots[0].name
+                bpy.data.scenes[sceneKey].render.filepath = self.path + self.c_shots[0]
                 bpy.ops.render.render("INVOKE_DEFAULT", write_still=True)
 
         return {"PASS_THROUGH"}
